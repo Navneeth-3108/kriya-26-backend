@@ -1,15 +1,22 @@
 import Round2Question from "../models/round2questions.js";
 
-// Create a new Round2 question
 export const createRound2Question = async (req, res) => {
   try {
-    const question = new Round2Question(req.body);
+    const { title, description, allowedAlgorithms, timeLimitSec, testCases, createdBy } = req.body;
+
+    if (!title || !description || !testCases || testCases.length === 0) {
+      return res.status(400).json({ msg: "title, description, and at least one testCase are required" });
+    }
+
+    const question = new Round2Question({ title, description, allowedAlgorithms, timeLimitSec, code: req.body.code, testCases, createdBy });
     await question.save();
     res.json(question);
   } catch (err) {
-    res.status(400).json({ msg: "Error creating Round2 question", error: err });
+    res.status(400).json({ msg: "Error creating Round2 question", error: err.message });
   }
 };
+
+
 
 // Get all Round2 questions
 export const getRound2Questions = async (_req, res) => {

@@ -5,6 +5,7 @@ const round2QuestionSchema = new Schema({
   description: String,
   allowedAlgorithms: [{ type: Schema.Types.ObjectId, ref: "AlgorithmCard" }],
   timeLimitSec: Number,
+  code:String,
   testCases: [
     {
       input: String,

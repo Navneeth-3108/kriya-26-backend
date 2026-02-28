@@ -21,20 +21,20 @@ router.delete("/algorithmcard/:id", authMiddleware, AlgorithmCardController.dele
 router.get("/algorithmcard", authMiddleware, AlgorithmCardController.getCards);
 router.get("/algorithmcard/:id", authMiddleware, AlgorithmCardController.getCard);
 // Round1 routes
-router.post("/round1/questions", authMiddleware, round1questionsController.createQuestion);
-router.put("/round1/questions/:id", authMiddleware, round1questionsController.updateQuestion);
-router.delete("/round1/questions/:id", authMiddleware, round1questionsController.deleteQuestion);
-router.get("/round1/questions", authMiddleware, round1questionsController.getQuestions);
-router.get("/round1/questions/:id", authMiddleware, round1questionsController.getQuestion);
+router.post("/round1/questions", authMiddleware, round1questionsController.createRound1Question);
+router.put("/round1/questions/:id", authMiddleware, round1questionsController.updateRound1Question);
+router.delete("/round1/questions/:id", authMiddleware, round1questionsController.deleteRound1Question);
+router.get("/round1/questions", authMiddleware, round1questionsController.getRound1Questions);
+router.get("/round1/questions/:id", authMiddleware, round1questionsController.getRound1Question);
 
 
 //Round2 routes
 
-router.post("/round2/questions", authMiddleware, round2questionsController.createQuestion);
-router.put("/round2/questions/:id", authMiddleware, round2questionsController.updateQuestion);
-router.delete("/round2/questions/:id", authMiddleware, round2questionsController.deleteQuestion);
-router.get("/round2/questions", authMiddleware, round2questionsController.getQuestions);
-router.get("/round2/questions/:id", authMiddleware, round2questionsController.getQuestion);
+router.post("/round2/questions", authMiddleware, round2questionsController.createRound2Question);
+router.put("/round2/questions/:id", authMiddleware, round2questionsController.updateRound2Question);
+router.delete("/round2/questions/:id", authMiddleware, round2questionsController.deleteRound2Question);
+router.get("/round2/questions", authMiddleware, round2questionsController.getRound2Questions);
+router.get("/round2/questions/:id", authMiddleware, round2questionsController.getRound2Question);
 
 // Leaderboard routes
 router.get("/leaderboard", authMiddleware, leaderboardController.getLeaderboard);

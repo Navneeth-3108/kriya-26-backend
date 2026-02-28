@@ -28,15 +28,23 @@ export const getTeam = async (req, res) => {
 /**
  * Create a new team
  */
+
 export const createTeam = async (req, res) => {
   try {
+    const { teamName, kriyaID, captainName, regMail, shipConfig } = req.body;
+
+    if (!teamName || !kriyaID || !captainName || !regMail || !shipConfig) {
+      return res.status(400).json({ msg: "All required fields must be provided" });
+    }
+
     const team = new Team(req.body);
     await team.save();
     res.status(201).json(team);
   } catch (err) {
-    res.status(400).json({ msg: "Error creating team", error: err });
+    res.status(400).json({ msg: "Error creating team", error: err.message });
   }
 };
+
 
 /**
  * Update an existing team
