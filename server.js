@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 
 import otpRoutes from "./routes/otpRoutes.js";
 import adminRoutes from "./routes/AdminRoutes.js";
+import SubmissionRoutes from "./routes/round1SubmissionRoutes.js";
+
 
 
 dotenv.config();
@@ -11,19 +13,25 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// Health check
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "Server is running" });
-});
-
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected ✅"))
   .catch((err) => console.log("MongoDB connection error ❌", err));
 
 // Routes
-app.use("/api/admin", adminRoutes);
-app.use("/api/otp", otpRoutes);
+const mainRouter = express.Router();
+
+// Health check
+mainRouter.get("/", (req, res) => {
+  res.status(200).json({ message: "Server is running" });
+});
+
+mainRouter.use("/api/admin", adminRoutes);
+mainRouter.use("/api/otp", otpRoutes);
+mainRouter.use("/", SubmissionRoutes);
+
+
+app.use("/kriyabe", mainRouter);
 
 // Server start
 const PORT = process.env.PORT || 3000;
