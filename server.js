@@ -5,8 +5,8 @@ import mongoose from "mongoose";
 import otpRoutes from "./routes/otpRoutes.js";
 import adminRoutes from "./routes/AdminRoutes.js";
 import SubmissionRoutes from "./routes/round1SubmissionRoutes.js";
-
-
+import teamRoutes from "./routes/teamRoutes.js";
+import actionCardRoutes from "./routes/actionCardRoutes.js";
 
 dotenv.config();
 
@@ -28,6 +28,8 @@ mainRouter.get("/", (req, res) => {
 
 mainRouter.use("/api/admin", adminRoutes);
 mainRouter.use("/api/otp", otpRoutes);
+mainRouter.use("/api/teams", teamRoutes);
+mainRouter.use("/api/action-cards", actionCardRoutes);
 mainRouter.use("/", SubmissionRoutes);
 
 
