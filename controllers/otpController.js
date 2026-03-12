@@ -1,6 +1,7 @@
 import Team from "../models/Team.js";
 import generateOTP from "../utils/otpGenerator.js";
 import sendOTPEmail from "../services/mailService.js";
+import jwt from "jsonwebtoken";
 
 export const sendOTP = async (req, res) => {
   const { kriyaID } = req.body;
@@ -59,7 +60,21 @@ export const verifyOTP = async (req, res) => {
     team.otpExpiry = null;
     await team.save();
 
-    res.status(200).json({ message: "OTP verified successfully" });
+    const token = jwt.sign(
+      { id: team._id, kriyaID: team.kriyaID, role: "team" },
+      process.env.JWT_SECRET,
+      { expiresIn: "6h" }
+    );
+
+    res.status(200).json({
+      message: "OTP verified successfully",
+      token,
+      team: {
+        id: team._id,
+        kriyaID: team.kriyaID,
+        teamName: team.teamName
+      }
+    });
   } catch (error) {
     console.error("Error in verifyOTP:", error);
     res.status(500).json({ message: "OTP verification failed" });

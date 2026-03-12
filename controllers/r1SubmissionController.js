@@ -8,7 +8,7 @@ import Team from "../models/Team.js";
 export const handleSubmission = async (req, res) => {
     try {
         const { questionType, questionNo } = req.params;
-        const { kriyaID } = req.query;
+        const kriyaID = req.team?.kriyaID || req.query.kriyaID;
 
         const qNum = parseInt(questionNo);
 
@@ -76,7 +76,7 @@ export const handleSubmission = async (req, res) => {
 export const verifyAnswer = async (req, res) => {
     try {
         const { questionType, questionNo, answer: userRoutesAnswer } = req.params;
-        const { kriyaID } = req.query;
+        const kriyaID = req.team?.kriyaID || req.query.kriyaID;
 
         const qNum = parseInt(questionNo);
 

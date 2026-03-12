@@ -25,30 +25,59 @@ const teamSchema = new mongoose.Schema({
   },
   shipConfig: {
     type: String,
-    enum: ["Warship", "Merchant Vessel", "Ghost Ship"],
-    required: true,
-    trim: true
+    enum: ["WARSHIP", "MERCHANT", "GHOST"],
+    default: null
   },
+  setNo: {
+  type: Number,
+  min: 1,
+  max: 6,
+  default: null
+},
   round1: {
     selectedScrolls: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "Problem" }
+      // { type: mongoose.Schema.Types.ObjectId, ref: "Problem" }
+      {name: String,difficultyTag: String}
     ],
     score: { type: Number, default: 0 }
   },
   round2: {
     score: { type: Number, default: 0 },
-    problemStatus: [
+    problemsStatus: [
       {
-        problemId: { type: mongoose.Schema.Types.ObjectId, ref: "Problem" },
+        problemId: { type: mongoose.Schema.Types.ObjectId, ref: "Round2Question" },
         livesLeft: { type: Number, default: 3 },
         wrongSubmissions: { type: Number, default: 0 },
+        startTime: { type: Date, default: null },
         status: {
           type: String,
-          enum: ["NOT_STARTED", "SOLVED", "SANK"],
+          enum: ["NOT_STARTED", "ACTIVE", "SOLVED", "SUNK"],
           default: "NOT_STARTED"
         }
       }
-    ]
+    ],
+    // Action card usage + effect flags for Round 2
+    actionCardsUsed: [
+      {
+        cardId: { type: mongoose.Schema.Types.ObjectId, ref: "ActionCard" },
+        effectType: { type: String },
+        effectValue: { type: Number },
+        usedAt: { type: Date }
+      }
+    ],
+    totalCardsUsed: { type: Number, default: 0 },
+    // Card 2: ignore one failed testcase on next submission
+    ignoreNextFailedTestcase: { type: Boolean, default: false },
+    // Card 4: a hint is available for the current problem
+    hasHintAvailable: { type: Boolean, default: false },
+    // Card 5: next mini‑game reward will be doubled
+    doubleNextMiniGameReward: { type: Boolean, default: false },
+    // Card 6: swap current question for a new one on next attempt
+    swapCurrentQuestionOnNextAttempt: { type: Boolean, default: false },
+    // Card 7: prevent difficulty increase for the next question
+    freezeDifficultyNextQuestion: { type: Boolean, default: false },
+    // Card 8: reveal which testcase failed on the next run
+    revealFailedTestcaseNextRun: { type: Boolean, default: false }
   },
   totalScore: { type: Number, default: 0 },
   currentIsland: {
