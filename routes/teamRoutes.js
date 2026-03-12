@@ -16,13 +16,20 @@ import {
 
 const router = Router();
 
+
+// Ship config
+router.post("/select-ship", selectShip);
+
+
+
+
 // Auth
 router.post("/login", login);
 router.post("/logout", teamAuthMiddleware, logout);
 
 // Ship config
 // router.post("/choose-shipconfig", teamAuthMiddleware, chooseShipConfig);
-router.post("/select-ship", selectShip);
+
 // Round answers
 router.post("/round1answers", teamAuthMiddleware, round1Answers);
 router.post("/round2answers", teamAuthMiddleware, round2Answers);
