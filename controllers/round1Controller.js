@@ -130,6 +130,14 @@ export const submitRound1Answer = async (req, res) => {
       });
     }
 
+    if (!team.round1) {
+      team.round1 = { selectedScrolls: [], score: 0 };
+    }
+
+    if (!team.round1.selectedScrolls) {
+      team.round1.selectedScrolls = [];
+    }
+
     const card = question.algorithmCard || null;
 
     const alreadyUnlocked = team.round1.selectedScrolls.some(
@@ -151,9 +159,12 @@ export const submitRound1Answer = async (req, res) => {
     team.totalScore += points;
 
     if (card) {
+      const randomQuestionNo = Math.floor(Math.random() * 5);
+
       team.round1.selectedScrolls.push({
         name: card.name,
         difficultyTag: card.difficultyTag,
+        questionNo: randomQuestionNo,
       });
     }
 
@@ -165,7 +176,6 @@ export const submitRound1Answer = async (req, res) => {
       card: card,
       msg: "Correct answer!",
     });
-
   } catch (err) {
     res.status(500).json({
       msg: "Error submitting answer",

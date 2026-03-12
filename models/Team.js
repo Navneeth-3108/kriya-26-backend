@@ -37,7 +37,10 @@ const teamSchema = new mongoose.Schema({
   round1: {
     selectedScrolls: [
       // { type: mongoose.Schema.Types.ObjectId, ref: "Problem" }
-      {name: String,difficultyTag: String}
+       {
+      name: { type: String },
+      questionNo: { type: Number, default: null }  // initially null
+    }
     ],
     score: { type: Number, default: 0 }
   },
