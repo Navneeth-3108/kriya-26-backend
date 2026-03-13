@@ -25,7 +25,7 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://localhost:5174"],
     credentials: true,
   })
 );
@@ -61,6 +61,9 @@ mainRouter.use("/api/otp", otpRoutes);
 // Standalone Round 1 & Round 2 question routes
 mainRouter.use("/api/round1", round1Routes);
 mainRouter.use("/api/round2", round2Routes);
+
+//round2 questions generarte routes
+mainRouter.use("/kriyabe/api/round2", round2Routes);
 
 // Submission routes
 mainRouter.use("/api/round1/submissions", round1SubmissionRoutes);

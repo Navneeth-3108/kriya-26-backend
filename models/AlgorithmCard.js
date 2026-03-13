@@ -19,7 +19,7 @@ const algorithmSchema = new mongoose.Schema({
   Array: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Round1Question"
+      ref: "Round2Question"
     }
   ]
 });
