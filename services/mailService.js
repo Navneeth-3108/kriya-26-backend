@@ -1,19 +1,18 @@
 import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.MAIL_ID,
-    pass: process.env.MAIL_PASSWORD,
-  },
-});
-
-// Function to send OTP email
 async function sendOTPEmail(email, otp) {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MAIL_ID,
+      pass: process.env.MAIL_PASSWORD,
+    },
+  });
+
   const mailOptions = {
-    from: process.env.MAIL_ID,
+    from: `"Kriya 26" <${process.env.MAIL_ID}>`,
     to: email,
-    subject: "Login OTP",
+    subject: "Login OTP - Kriya 26",
     text: `Your OTP is ${otp}. It expires in an hour.`,
   };
 

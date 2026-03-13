@@ -22,13 +22,16 @@ export const sendOTP = async (req, res) => {
     team.otpExpiry = expiresAt;
     await team.save();
 
-    await sendOTPEmail(team.regMail, otp);
-    res.status(200).json({ message: "OTP sent to registered email" });
+    await sendOTPEmail(team.regMail, otp); // already normalized by schema
+
+    return res.status(200).json({ message: "OTP sent to registered email" });
   } catch (error) {
     console.error("Error in sendOTP:", error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
 
 export const verifyOTP = async (req, res) => {
   const { kriyaID, otp } = req.body;

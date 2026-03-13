@@ -4,7 +4,7 @@ import Team from "../models/Team.js";
 // GET all questions of a team
 export const getRound1Questions = async (req, res) => {
   try {
-    const { kriyaID } = req.query;
+    const kriyaID = req.query.kriyaID || req.params.kriyaID;
 
     if (!kriyaID) {
       return res.status(400).json({ msg: "kriyaID is required" });
