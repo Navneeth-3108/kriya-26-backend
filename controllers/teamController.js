@@ -169,47 +169,60 @@ export const round2Answers = async (req, res) => {
       return res.status(400).json({ msg: "No scrolls selected for Round 2" });
     }
 
-    // Enforce exactly 3 distinct scrolls
-    const uniqueScrolls = [...new Set(selectedScrolls.map(String))];
-    if (uniqueScrolls.length !== 3) {
-      return res.status(400).json({ msg: "Exactly 3 distinct scrolls are required" });
-    }
-
-    // Get ship lives
-    const shipConfig = getShipConfig(team.shipConfig);
-    const lives = shipConfig ? shipConfig.round2Lives : 3;
-
     // Map each scroll to a Round 2 problem
     const problemsStatus = [];
     const usedProblemIds = new Set();
     const allQuestions = await Round2Question.find({});
     
+    // Ensure we only process unique scrolls
+    const uniqueScrolls = [...new Set(selectedScrolls)];
+    
+    const shipConfig = getShipConfig(team.shipConfig);
+    const initialLives = shipConfig ? shipConfig.round2Lives : 3;
+
     for (const scrollId of uniqueScrolls) {
+      // Find a problem that strictly matches this algorithm
       let problem = allQuestions.find(q => 
-          Array.isArray(q.allowedAlgorithms) && q.allowedAlgorithms.map(String).includes(String(scrollId))
+        Array.isArray(q.allowedAlgorithms) && 
+        q.allowedAlgorithms.map(String).includes(String(scrollId)) &&
+        !usedProblemIds.has(q._id.toString())
       );
 
-      // Backfill missing quests if no strict match is found
+      // Backfill: if no strict match, find any unused question
       if (!problem) {
-         problem = allQuestions.find(q => !usedProblemIds.has(q._id.toString()));
+        problem = allQuestions.find(q => !usedProblemIds.has(q._id.toString()));
       }
 
-      if (!problem) {
-        return res.status(400).json({
-          msg: `Not enough Round 2 problems available to map for scroll ${scrollId}. Database needs more questions.`
+      if (problem) {
+        usedProblemIds.add(problem._id.toString());
+        problemsStatus.push({
+          problemId: problem._id,
+          livesLeft: initialLives,
+          bonusLives: 0,
+          wrongSubmissions: 0,
+          status: "NOT_STARTED"
         });
       }
-
-      usedProblemIds.add(problem._id.toString());
-      problemsStatus.push({
-        problemId: problem._id,
-        livesLeft: lives,
-        wrongSubmissions: 0,
-        status: "NOT_STARTED"
-      });
     }
 
-    team.round2.problemsStatus = problemsStatus;
+    if (problemsStatus.length === 0) {
+        return res.status(400).json({ 
+            msg: "Could not find any problems for your selected scrolls. Please contact an admin." 
+        });
+    }
+
+    // Merge new problems while preserving status of existing ones
+    const existingStatus = team.round2.problemsStatus || [];
+    const mergedStatus = [...existingStatus];
+
+    for (const newPs of problemsStatus) {
+      const exists = mergedStatus.find(p => String(p.problemId) === String(newPs.problemId));
+      if (!exists) {
+        mergedStatus.push(newPs);
+      }
+    }
+
+    team.round2.problemsStatus = mergedStatus;
     await team.save();
 
     res.json({
