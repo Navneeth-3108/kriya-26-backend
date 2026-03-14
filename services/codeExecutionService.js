@@ -3,10 +3,12 @@
  *
  * Self-hosted Judge0 instance at configurable URL.
  * Supports C (50), Java (62), Python (71).
+ * Uses Node http/https so both http and https Judge0 URLs work (node-fetch v3 only allows https).
  */
 
+import http from "http";
 import https from "https";
-import fetch from "node-fetch";
+import { URL } from "url";
 
 const LANGUAGE_IDS = {
     C: 50,
@@ -16,6 +18,43 @@ const LANGUAGE_IDS = {
 };
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+
+/**
+ * Promise-based request using Node http/https (supports both protocols).
+ * node-fetch v3 only supports https; Judge0 is often run over http internally.
+ */
+function request(urlStr, options = {}) {
+    const url = new URL(urlStr);
+    const isHttps = url.protocol === "https:";
+    const lib = isHttps ? https : http;
+    const reqOptions = {
+        hostname: url.hostname,
+        port: url.port || (isHttps ? 443 : 80),
+        path: url.pathname + url.search,
+        method: options.method || "GET",
+        headers: options.headers || {}
+    };
+    if (isHttps) reqOptions.agent = httpsAgent;
+
+    return new Promise((resolve, reject) => {
+        const req = lib.request(reqOptions, (res) => {
+            const chunks = [];
+            res.on("data", (chunk) => chunks.push(chunk));
+            res.on("end", () => {
+                const body = Buffer.concat(chunks).toString();
+                resolve({
+                    ok: res.statusCode >= 200 && res.statusCode < 300,
+                    status: res.statusCode,
+                    text: () => Promise.resolve(body),
+                    json: () => Promise.resolve(JSON.parse(body || "null"))
+                });
+            });
+        });
+        req.on("error", reject);
+        if (options.body) req.write(options.body);
+        req.end();
+    });
+}
 
 /**
  * Normalizes "polluted" test case data (e.g., 's = "abc"' -> 'abc')
@@ -83,13 +122,12 @@ export async function executeCode(language, sourceCode, stdin, timeLimitSec = 10
         cpu_time_limit: Math.min(timeLimitSec, 15)
     };
 
-    const response = await fetch(
+    const response = await request(
         `${JUDGE0_URL}/submissions?base64_encoded=false&wait=true`,
         {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-            agent: httpsAgent
+            body: JSON.stringify(payload)
         }
     );
 
